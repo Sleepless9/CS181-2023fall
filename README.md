@@ -1,2 +1,3 @@
 # CS181-2023fall
-hhhha
+
+This is the CS181 final project, owned by Qijch, Shijy, Xuchh, Zhaozy and Zhuyh.
