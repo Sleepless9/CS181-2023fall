@@ -841,5 +841,9 @@ if __name__ == "__main__":
                 print(f"step {steps} total_reward {total_reward:+0.2f}")
             steps += 1
             if terminated or truncated or restart or quit or repeat_neg_reward>=300:
+                if terminated or truncated or repeat_neg_reward>=300:
+                    file_path = "data_human"
+                    with open(file_path, "a") as file:
+                        file.write(f"{total_reward:.2f}\n")
                 break
     env.close()
