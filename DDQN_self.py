@@ -2,15 +2,14 @@ import numpy as np
 import gym
 import cv2
 import random
-from scipy import stats
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from tensorflow.keras.losses import Huber
+from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 
 import os
-import tqdm
 tf.compat.v1.disable_eager_execution()
 
 from collections import deque
@@ -30,8 +29,8 @@ class Agent:
         self.width = 96
         self.channels = 1
         self.action_space = [(-1,1,0.5),(0,1,0.5),(1,1,0.5),
-                             (-1,0,0.5),(0,0,0.5),(1,0,0.5),
                              (-1,1,0),(0,1,0),(1,1,0),
+                             (-1,0,0.5),(0,0,0.5),(1,0,0.5),
                              (-1,0,0),(0,0,0),(1,0,0),]  #steer, gas, breaking
         self.gamma = 0.99
         self.learning_rate = 0.0003
@@ -42,17 +41,17 @@ class Agent:
         self.model = Sequential()
         self.model.add(Conv2D(filters=6, kernel_size=(7, 7), strides=3, activation='relu', input_shape=(self.height, self.width, self.channels)))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
-        self.model.add(Conv2D(filters=12, kernel_size=(3, 3), activation='relu'))   #参数调整
+        self.model.add(Conv2D(filters=12, kernel_size=(4, 4), activation='relu'))   #参数调整
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
         self.model.add(Flatten())
 
         # Dense layers
-        self.model.add(Dense(units=256, activation='relu'))
+        self.model.add(Dense(units=216, activation='relu'))
         self.model.add(Dense(units=12, activation='linear'))
 
         # Compile the model with Huber loss
         self.model.compile(optimizer=Adam(learning_rate = self.learning_rate), loss=Huber())
-        self.target_model = tf.keras.model.clone_model(self.model)
+        self.target_model = tf.keras.models.clone_model(self.model)
 
     def choose_action(self,state):     #没有加best
         state = np.expand_dims(state,axis = 0)
@@ -66,12 +65,12 @@ class Agent:
         best_batch = []
         number_list = list(range(1,len(self.experience_replay_buffer)+1))
         for _ in range(MAX_BATCH_MEMORY):
-            total_number = len(len(self.experience_replay_buffer))*(len(len(self.experience_replay_buffer))+1)//2
+            total_number = len(number_list)*(len(number_list)+1)//2
             probs = []
-            for i in range(len(self.experience_replay_buffer)):
+            for i in range(len(number_list)):
                 probs.append((i+1)/total_number)
             choice = np.random.choice(number_list,1,p = probs)[0]#就是按照概率梯度取前面的，排列
-            del number_list[choice-1]  #不要重复取
+            del number_list[number_list.index(choice)]  #不要重复取
             best_batch.append(self.experience_replay_buffer[choice-1])
         return best_batch
             
@@ -110,15 +109,15 @@ class Agent:
         data_direction = "./reword_self"
         if not os.path.exists( model_direction ):
              os.makedirs( model_direction )
-        self.target_model.save_weights( model_direction + f"episode_{count}" + ".h5" )
+        self.target_model.save_weights( model_direction + f"/episode_{count}" + ".h5" )
 
         # saving results
         if not os.path.exists( data_direction ):
              os.makedirs( data_direction )
-        np.savetxt(f"{data_direction}" + f"episode_{count}" + ".csv", data, delimiter=",")
+        np.savetxt(f"{data_direction}" + f"/episode_{count}" + ".csv", data, delimiter=",")
     
-    def load_model(self, count):
-        self.model.load_weights(f"episode_{count}")
+    def load_model(self, name):
+        self.model.load_weights(name)
         self.model.set_weights( self.model.get_weights() )
 
 
