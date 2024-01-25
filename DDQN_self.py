@@ -61,7 +61,7 @@ class Agent:
             action_index = random.randrange(len(self.action_space))   
         return self.action_space[action_index]
     
-    def get_best_batch(self):
+    def get_batch(self):
         best_batch = []
         number_list = list(range(1,len(self.experience_replay_buffer)+1))
         for _ in range(MAX_BATCH_MEMORY):
@@ -76,7 +76,7 @@ class Agent:
             
     def experience(self):
         if len(self.experience_replay_buffer)>MAX_BATCH_MEMORY:
-            batch_before = self.get_best_batch()
+            batch_before = self.get_batch()
             
             train_state = []
             train_target = []
@@ -127,7 +127,9 @@ def convert_to_grey(state):
     lower_grey = np.array([100, 100, 100])#灰度下界
     upper_grey = np.array([150, 150, 150])#灰度上界
     mask = cv2.inRange(after_cut, lower_grey, upper_grey)
-
+    cv2.imwrite("RGB_image.jpg", after_cut)
+    cv2.imwrite("gray_image.jpg", mask)
+    os.system("pause")
     grey = cv2.cvtColor(state,  cv2.COLOR_BGR2GRAY)
     grey = grey.astype(float)
     grey_normalised = grey/ 255
