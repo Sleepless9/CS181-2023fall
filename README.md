@@ -21,6 +21,9 @@ We can see that the reward rises rapidly before 800 episodes and keep stay after
 
 ## Usage
 
+### Configuration
+Configure library according to `requirement.txt`.
+
 ### Play By Human
 You can try the car_racing game by yourself by using the following command and the score of each game will be saved in `data_human.csv`
 ```
