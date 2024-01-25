@@ -127,9 +127,9 @@ def convert_to_grey(state):
     lower_grey = np.array([100, 100, 100])#灰度下界
     upper_grey = np.array([150, 150, 150])#灰度上界
     mask = cv2.inRange(after_cut, lower_grey, upper_grey)
-    cv2.imwrite("RGB_image.jpg", after_cut)
-    cv2.imwrite("gray_image.jpg", mask)
-    os.system("pause")
+    # cv2.imwrite("RGB_image.jpg", after_cut)
+    # cv2.imwrite("gray_image.jpg", mask)
+    # os.system("pause")
     grey = cv2.cvtColor(state,  cv2.COLOR_BGR2GRAY)
     grey = grey.astype(float)
     grey_normalised = grey/ 255
