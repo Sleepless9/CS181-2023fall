@@ -823,6 +823,7 @@ if __name__ == "__main__":
     env = CarRacing(render_mode="human")
 
     quit = False
+    all_rewards = []
     while not quit:
         env.reset()
         total_reward = 0.0
@@ -842,8 +843,10 @@ if __name__ == "__main__":
             steps += 1
             if terminated or truncated or restart or quit or repeat_neg_reward>=300:
                 if terminated or truncated or repeat_neg_reward>=300:
-                    file_path = "data_human"
-                    with open(file_path, "a") as file:
-                        file.write(f"{total_reward:.2f}\n")
+                    all_rewards.append(total_reward)
                 break
+
+    path = "data_human.csv"
+    np.savetxt(path, all_rewards, delimiter=",", fmt = "%s")
+    
     env.close()
