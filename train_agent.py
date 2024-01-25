@@ -1,7 +1,7 @@
 import gym
 from tqdm import tqdm
-from DDQN_self import Agent
-from DDQN_self import convert_to_grey
+from DDQN_agent import Agent
+from DDQN_agent import convert_to_grey
 
 MAX_PENALTY = -5
 RENDER = True

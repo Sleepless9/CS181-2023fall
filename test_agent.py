@@ -2,14 +2,14 @@ import gym
 import os
 import time
 import numpy as np
-from DDQN_self import Agent
-from DDQN_self import convert_to_grey
+from DDQN_agent import Agent
+from DDQN_agent import convert_to_grey
 
 MAX_PENALTY = -5
 RENDER = True
 CONSECUTIVE_NEG_REWARD = 300
-REWARD_DIR = "./test_self/"
-PRETRAINED_PATH = "./model_self/episode_500.h5"
+REWARD_DIR = "./test/"
+PRETRAINED_PATH = "./model/episode_500.h5"
 
 def test(agent:Agent, env:gym.make, model:str, test_num:int):
     agent.load_model(model)   # load the model
@@ -27,7 +27,7 @@ def test(agent:Agent, env:gym.make, model:str, test_num:int):
         consecutive_negtive_reward = 0   # initialize 
 
         while True:
-            action = agent.choose_action(state_, True) # choose the best action
+            action = agent.choose_action(state_, True)      # choose the best action
             new_state, r, done, _ = env.step(action)        # get the next state according to action
 
             if RENDER:
