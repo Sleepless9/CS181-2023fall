@@ -1,0 +1,7 @@
+python == 3.8.18
+gym == 0.21.0
+tensorflow == 2.4.1
+keras == 2.13.1
+numpy == 1.20.3
+box2d-py == 2.3.5
+tqdm == 4.66.1
