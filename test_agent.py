@@ -9,7 +9,7 @@ MAX_PENALTY = -5
 RENDER = True
 CONSECUTIVE_NEG_REWARD = 300
 REWARD_DIR = "./reword_self"
-PRETRAINED_PATH = "./20240124-151752/episode_1000.h5"
+PRETRAINED_PATH = "./model_self/episode_500.h5"
 
 def test(agent:Agent, env:gym.make, model:str, test_num:int):
     agent.load_model(model)   # load the model
@@ -27,7 +27,7 @@ def test(agent:Agent, env:gym.make, model:str, test_num:int):
         consecutive_negtive_reward = 0   # initialize 
 
         while True:
-            action = agent.choose_action(state_) # choose the best action
+            action = agent.choose_action(state_, True) # choose the best action
             new_state, r, done, _ = env.step(action)        # get the next state according to action
 
             if RENDER:
@@ -49,7 +49,7 @@ def test(agent:Agent, env:gym.make, model:str, test_num:int):
         reward = round(reward, 2)
         t1 = round(t1, 2)
 
-        all_rewards.append([reward, np.nan, t1, np.nan, np.nan])
+        all_rewards.append([reward, t1])
 
         result_reward.append(reward)
         result_time.append(t1)
@@ -59,13 +59,13 @@ def test(agent:Agent, env:gym.make, model:str, test_num:int):
         max(result_reward), min(result_reward), round(np.mean(result_reward), 2), round(np.std(result_reward), 2)
     time_avg = round(np.mean(result_time), 2)
 
-    all_rewards.append([reward_avg, np.nan, time_avg, reward_max, reward_min, reward_std])
+    all_rewards.append([reward_avg, time_avg, reward_max, reward_min, reward_std])
 
     print(f"[INFO]: Total Run {test_index+1} | Avg Run Reward: {reward_avg} | Avg Time: {time_avg} | Max: {reward_max} | Min: {reward_min} | Std Dev: {reward_std}")
     
     save_test_results(all_rewards)
 
-    return [reward_avg, np.nan, time_avg, reward_max, reward_min, reward_std]
+    # return [reward_avg, time_avg, reward_max, reward_min, reward_std]
 
 
 def update_neg_reward(consecutive_negtive_reward, r):
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     env = gym.make('CarRacing-v0').env
 
     agent = Agent()
-    test(agent, env, model=PRETRAINED_PATH, test_num=10)
+    test(agent, env, model=PRETRAINED_PATH, test_num=20)

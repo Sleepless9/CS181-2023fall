@@ -1,5 +1,4 @@
 import numpy as np
-import gym
 import cv2
 import random
 
@@ -13,9 +12,6 @@ import os
 tf.compat.v1.disable_eager_execution()
 
 from collections import deque
-import time
-from plot_results import plotResults
-
 
 GPUs = tf.config.experimental.list_physical_devices('GPU')
 for gpu in GPUs:
@@ -53,9 +49,12 @@ class Agent:
         self.model.compile(optimizer=Adam(learning_rate = self.learning_rate), loss=Huber())
         self.target_model = tf.keras.models.clone_model(self.model)
 
-    def choose_action(self,state):     #没有加best
+    def choose_action(self,state,best=False):     #没有加best
         state = np.expand_dims(state,axis = 0)
         action_index = np.argmax(self.model.predict(state)[0])
+
+        if best: return self.action_space[action_index]
+
         sample = np.random.choice([0, 1], p=[1-self.epsilon, self.epsilon])
         if sample == 1:   #如果概率为epsilon就随机选择行动否则使用最佳行动
             action_index = random.randrange(len(self.action_space))   
