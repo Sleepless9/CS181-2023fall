@@ -8,7 +8,7 @@ from DDQN_self import convert_to_grey
 MAX_PENALTY = -5
 RENDER = True
 CONSECUTIVE_NEG_REWARD = 300
-REWARD_DIR = "./reword_self"
+REWARD_DIR = "./test_self/"
 PRETRAINED_PATH = "./model_self/episode_500.h5"
 
 def test(agent:Agent, env:gym.make, model:str, test_num:int):
@@ -75,7 +75,7 @@ def update_neg_reward(consecutive_negtive_reward, r):
         return 0
 
 def save_test_results(all_rewards):
-    save_path = f"test_{REWARD_DIR}"
+    save_path = REWARD_DIR
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     path = save_path + PRETRAINED_PATH.split('/')[-1][:-3] + "_run_rewards.csv"
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     env = gym.make('CarRacing-v0').env
 
     agent = Agent()
-    test(agent, env, model=PRETRAINED_PATH, test_num=20)
+    test(agent, env, model=PRETRAINED_PATH, test_num=10)
