@@ -7,7 +7,7 @@
 
 
 % ready for submission
-\usepackage[preprint]{neurips_2023}
+\usepackage[preprint]{car_racing}
 
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
@@ -92,14 +92,28 @@
 
 
 \begin{abstract}
-Car racing games hold significant practical importance and present a series of challenging technical problems. This final project endeavors to construct a model utilizing reinforcement learning techniques, specifically Double Q-learning (DDQN), within the OpenAI Gym environment. We establish a reward system and conduct experiments involving image processing and model architectures.
+Car racing games hold significant practical importance and present a series of 
+challenging technical problems. This final project endeavors to construct a 
+model utilizing reinforcement learning techniques, specifically Double Q-learning 
+(DDQN), within the OpenAI Gym environment. We establish a reward system and conduct 
+experiments involving image processing and model architectures. The final model 
+can perform the task well, reaching the level of human players
 
 \textbf{GitHub Repository:} \url{https://github.com/Sleepless9/CS181-2023fall}
 \end{abstract}
 
 \section{Introduction}
 
-Car racing games can be simulated to replicate real-world scenarios, allowing the definition of various constraints and goals. The original OpenAI Gym's CarRacing problem aimed for the car to traverse all track tiles, rather than completing a full lap. However, this implies that if the car misses some tiles, it will need to run at least one more lap. In this project, we modify the end condition to expedite training and testing, concluding an epoch if the car cannot traverse all tiles and fails to accrue new points within a specified frame limit. This unique end condition aims to encourage the agent to consistently progress on the road, swiftly concluding when yawning—a feature potentially beneficial in the realm of autonomous driving.
+Car racing games can be simulated to replicate real-world 
+scenarios, allowing the definition of various constraints and goals. The original 
+OpenAI Gym's CarRacing problem aimed for the car to traverse all track tiles, rather than 
+completing a full lap. However, this implies that if the car misses some tiles, 
+it will need to run at least one more lap. In this project, we modify the end 
+condition to expedite training and testing, concluding an epoch if the car 
+cannot traverse all tiles and fails to accrue new points within a specified 
+frame limit. This unique end condition aims to encourage the agent to consistently 
+progress on the road, swiftly concluding when yawing—a feature potentially beneficial 
+in the realm of autonomous driving.
 
 
 \section{Problem Analysis}
@@ -130,25 +144,6 @@ This problem can lead to many solutions and be applied to the field of autonomou
 We choose to do grayscale convertion to help the agent learn about the environment from 
 observation. Such a solution is enough to help us complete the recognition in the box2d 
 environment, and will not produce too much calculation to drag down the training of the model.
-
-\begin{figure}[ht!]
-  \centering
-  \caption{Grayscale Convertion Process}
-  \subfigure[Observed Image]{
-      \includegraphics[width=0.3\textwidth]{observe_image.jpg}
-      \label{fig:subfig1}
-  }
-  \subfigure[RGB Image]{
-      \includegraphics[width=0.3\textwidth]{RGB_image.jpg}
-      \label{fig:subfig2}
-  }
-  \subfigure[Grayscale Image]{
-      \includegraphics[width=0.3\textwidth]{gray_image.jpg}
-      \label{fig:subfig3}
-  }
-  % \caption{并列的图片}
-  % \label{fig:main}
-\end{figure}
 
 
 \section{Related Model}
@@ -236,10 +231,60 @@ to remove the following scores and the status bar of the vehicle to get a comple
 i.e. reduce the number of pixel blocks to be processed. 
 Use cv2 to use color segmentation to convert roads into white, lawns and vehicles into black.
 
+\begin{figure}[ht!]
+  \centering
+  \caption{Grayscale Convertion Process}
+  \subfigure[Observed Image]{
+      \includegraphics[width=0.3\textwidth]{../resource/observe_image.jpg}
+      \label{fig:subfig1}
+  }
+  \subfigure[RGB Image]{
+      \includegraphics[width=0.3\textwidth]{../resource/RGB_image.jpg}
+      \label{fig:subfig2}
+  }
+  \subfigure[Grayscale Image]{
+      \includegraphics[width=0.3\textwidth]{../resource/gray_image.jpg}
+      \label{fig:subfig3}
+  }
+  % \caption{并列的图片}
+  % \label{fig:main}
+\end{figure}
+
 \subsection{Training}
-We set \texttt{episode\_num} times to loop, and run the game once in each loop.If the game is over or the road cannot be recognized in the image or the totalreward is less than the minimum value or no positive reward is obtained for 100consecutive frames (that is, no blocks are eaten, it is purely a time deduction),the loop ends. Each time, the obtained state is converted from the color stateto a grayscale image, and \texttt{road\_visibility} is obtained from it to ensure thatthe road can be recognized in the image and avoid meaningless training sets.From the obtained grayscale image, the agent finds the optimal action correspondingto the image in the model, and uses the action to run the game to obtain thenext state. The \texttt{skip\_frames} method is used to introduce time continuity andprovide the agent with more information for decision-making.At the same time, we process the reward obtained and set an upper limit for it. Becausewe don't want it to run too fast, so that it will be easily thrown away when turning.Therefore, no matter how fast the car runs, it can only get so many rewards at most, andgoing too fast will result in a low score, which will drive the car to drive rationally.Then convert the resulting new state from the color state to a grayscale image,and update \texttt{road\_visibility}.After that, the old and new status, action, reward, and whether it is completed are storedin the agent, and experience playback is performed. Finally, reward is added to the total.The process would update the agent's action\_value network every 5 cycles.
+We set \texttt{episode\_num} times to loop, and run the game once in each loop. If the 
+game is over or the road cannot be recognized in the image or the totalreward is less 
+than the minimum value or no positive reward is obtained for 100consecutive frames 
+(that is, no blocks are eaten, it is purely a time deduction), the loop ends. Each time, 
+the obtained state is converted from the color stateto a grayscale image, and 
+\texttt{road\_visibility} is obtained from it to ensure thatthe road can be recognized 
+in the image and avoid meaningless training sets. From the obtained grayscale image, 
+the agent finds the optimal action correspondingto the image in the model, and uses 
+the action to run the game to obtain thenext state. The \texttt{skip\_frames} method 
+is used to introduce time continuity andprovide the agent with more information for 
+decision-making. At the same time, we process the reward obtained and set an upper 
+limit for it. Becausewe don't want it to run too fast, so that it will be easily 
+thrown away when turning. Therefore, no matter how fast the car runs, it can only get 
+so many rewards at most, andgoing too fast will result in a low score, which will drive 
+the car to drive rationally. Then convert the resulting new state from the color 
+state to a grayscale image, and update \texttt{road\_visibility}. After that, the 
+old and new status, action, reward, and whether it is completed are storedin the 
+agent, and experience playback is performed. Finally, reward is added to the total. 
+
+The process would update the agent's action\_value network every 5 cycles.
+
 \subsection{Test}
-This part is to load the model from model to agent. Same as training part,We set \texttt{test\_num} times to loop, and run the game once in each loop.If the game ends or the total reward is less than the minimum value or no positivereward is obtained for 300 consecutive frames (that is, no tiless have been traversed, it ispurely a time deduction), the loop ends. Then convert the obtained state fromcolor state to grayscale image each time. From the obtained grayscale image,the agent finds the optimal action corresponding to the image in the model, and usesthe action to run the game to obtain the next state. The \texttt{skip\_frames}method is usedto introduce time continuity and provide the agent with more information for decision-making.After that, the old and new status, action, reward, and whether it is completed are storedin the agent, and experience playback is performed. Later, reward is added to the total.
+This part is to load the model from model to agent. Same as training part, we set 
+\texttt{test\_num} times to loop, and run the game once in each loop. If the game ends 
+or the total reward is less than the minimum value or no positivereward is obtained 
+for 300 consecutive frames (that is, no tiless have been traversed, it ispurely a 
+time deduction), the loop ends. Then convert the obtained state fromcolor state to 
+grayscale image each time. From the obtained grayscale image, the agent finds the 
+optimal action corresponding to the image in the model, and usesthe action to run 
+the game to obtain the next state. The \texttt{skip\_frames}method is usedto 
+introduce time continuity and provide the agent with more information for decision-making. 
+After that, the old and new status, action, reward, and whether it is completed are 
+storedin the agent, and experience playback is performed. Later, reward is added to the total.
+
 Finally, calculate the maximum, minimum, average, and variance of the reward obtained, and 
 store the data in the ".csv" file.
 
@@ -251,7 +296,7 @@ store the data in the ".csv" file.
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[scale=0.5]{chart.png}
+  \includegraphics[scale=0.5]{../resource/chart.png}
   \caption{Average Rewards}
   \label{figure}
 \end{figure}
@@ -268,6 +313,9 @@ store the data in the ".csv" file.
 
 [4] Changmao Li (2019). Challenging On Car Racing Problem from OpenAI Gym.
 Retrieved from \url{https://arxiv.org/pdf/1911.04868.pdf}
+
+[5] Yash Maniyar, Nidhi Manoj (2019). Racetrack Navigation on OpenAIGym with Deep Reinforcement Learning. \url{https://web.stanford.edu/class/aa228/reports/2019/final9.pdf}
+
 
 
 
