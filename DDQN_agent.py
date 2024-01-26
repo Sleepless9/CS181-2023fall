@@ -11,8 +11,6 @@ import tensorflow as tf
 import os
 tf.compat.v1.disable_eager_execution()
 
-from collections import deque
-
 GPUs = tf.config.experimental.list_physical_devices('GPU')
 for gpu in GPUs:
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -33,23 +31,19 @@ class Agent:
         self.epsilon = 1.0
         self.epsilon_decrease = 0.9999
         self.epsilon_min = 0.05
-        self.experience_replay_buffer = deque(maxlen=10000)
+        self.experience_replay_buffer =[]
         self.model = Sequential()
         self.model.add(Conv2D(filters=6, kernel_size=(7, 7), strides=3, activation='relu', input_shape=(self.height, self.width, self.channels)))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
         self.model.add(Conv2D(filters=12, kernel_size=(4, 4), activation='relu'))   #参数调整
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
         self.model.add(Flatten())
-
-        # Dense layers
         self.model.add(Dense(units=216, activation='relu'))
         self.model.add(Dense(units=12, activation='linear'))
-
-        # Compile the model with Huber loss
         self.model.compile(optimizer=Adam(learning_rate = self.learning_rate), loss=Huber())
         self.target_model = tf.keras.models.clone_model(self.model)
 
-    def choose_action(self,state,best=False):     #没有加best
+    def choose_action(self,state,best=False):
         state = np.expand_dims(state,axis = 0)
         action_index = np.argmax(self.model.predict(state)[0])
 
@@ -79,15 +73,16 @@ class Agent:
             
             train_state = []
             train_target = []
-            for state, action, reward, next_state, done in batch_before:
+            for state, action, reward, next_state, finish in batch_before:
                 target = self.model.predict(np.expand_dims(state,axis = 0))[0]
-                if done:
+                if finish:
                     target[self.action_space.index(action)] = reward
                 else:
-                    ############ Double Deep Q Learning Here! #############
                     next_target = self.model.predict(np.expand_dims(next_state,axis = 0))[0]
                     target_pred = self.target_model.predict(np.expand_dims(next_state,axis = 0))[0]
-                    target_index = np.where(next_target == np.max(next_target))[0][0] #取next_target中最大的那个的序号
+                    for i in range(len(next_target)):
+                        if next_target[i] == np.max(next_target):
+                            target_index = i
                     target[self.action_space.index(action)] = reward + self.gamma * target_pred[ target_index ]
                 train_state.append(state)
                 train_target.append(target)
