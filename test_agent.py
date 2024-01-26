@@ -9,7 +9,7 @@ MAX_PENALTY = -5
 RENDER = True
 CONSECUTIVE_NEG_REWARD = 300
 REWARD_DIR = "./test/"
-PRETRAINED_PATH = "./model/episode_500.h5"
+PRETRAINED_PATH = "./model/episode_800.h5"
 
 def test(agent:Agent, env:gym.make, model:str, test_num:int):
     agent.load_model(model)   # load the model
